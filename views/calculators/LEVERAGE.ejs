@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leverage Analyzer - TRADE FLOW</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">◢ TRADE FLOW ◣</a>
+            <ul class="nav-links">
+                <li><a href="/">MENU</a></li>
+                <li><a href="/margin">MARGIN</a></li>
+                <li><a href="/leverage" class="active">LEVERAGE</a></li>
+                <li><a href="/risk-reward">R/R</a></li>
+                <li><a href="/profit-loss">P/L</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="header">
+        <h1>◢ LEVERAGE & EXPOSURE ◣</h1>
+        <p>Analyze real market power vs account equity</p>
+    </div>
+
+    <div class="container">
+        <div class="form-wrapper">
+            <div class="form-section">
+                <h3>❯❯ EXPOSURE DATA</h3>
+                <form id="levForm">
+                    <div class="form-group">
+                        <label>ACCOUNT BALANCE / EQUITY</label>
+                        <input type="number" id="equity" placeholder="e.g. 10000" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>POSITION SIZE (LOTS)</label>
+                        <input type="number" id="lots" step="0.01" value="1.0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>ASSET PRICE (e.g. EUR/USD)</label>
+                        <input type="number" id="price" step="0.00001" value="1.00000" required>
+                    </div>
+
+                    <button type="submit" class="btn">◢ CALCULATE REAL LEVERAGE ◣</button>
+                    <button type="button" class="btn" style="background: var(--gray); color: var(--light); margin-top: 10px;" onclick="resetLev()">⟲ RESET SYSTEM</button>
+                </form>
+            </div>
+
+            <div class="result-section" id="levResults">
+                <div class="alert">
+                    <h4 id="resTitle">▸ EXPOSURE REPORT</h4>
+                    <p style="font-size: 11px; opacity: 0.7;">Effective market power assessment</p>
+                </div>
+
+                <div class="result-grid">
+                    <div class="result-item" style="border-color: var(--primary);">
+                        <span class="result-label">EFFECTIVE LEVERAGE</span>
+                        <span class="result-value" id="effLev">1 : 0.0</span>
+                    </div>
+                </div>
+
+                <div class="info-box" style="margin-top: 25px;">
+                    <h4 style="color: var(--primary);">◢ EXPOSURE STATUS</h4>
+                    <p id="levVerdict" style="font-size: 13px; line-height: 1.4;">Calculate to see if your position size is safe relative to your equity.</p>
+                </div>
+
+                <table class="result-table" style="margin-top: 20px;">
+                    <tr>
+                        <td>Notional Value (Total Controlled)</td>
+                        <td id="notionalDisplay" style="color: var(--light); text-align: right; font-weight: bold;">$ 0.00</td>
+                    </tr>
+                    <tr>
+                        <td>Market Exposure %</td>
+                        <td id="exposurePerc" style="color: var(--primary); text-align: right; font-weight: bold;">0%</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <footer class="footer">
+        <p>◢ TRADE FLOW - Professional Trading Tools ◣</p>
+    </footer>
+
+    <script>
+        document.getElementById('levForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const equity = parseFloat(document.getElementById('equity').value);
+            const lots = parseFloat(document.getElementById('lots').value);
+            const price = parseFloat(document.getElementById('price').value);
+            
+            if (isNaN(equity) || isNaN(lots) || isNaN(price)) return;
+
+            const contractSize = 100000; // Standard Lot
+            const notionalValue = lots * contractSize * price;
+            const effectiveLeverage = notionalValue / equity;
+            const exposurePercent = (notionalValue / equity) * 100;
+
+            // UI Update
+            document.getElementById('effLev').textContent = `1 : ${effectiveLeverage.toFixed(2)}`;
+            document.getElementById('notionalDisplay').textContent = `$ ${notionalValue.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('exposurePerc').textContent = `${exposurePercent.toFixed(0)}%`;
+
+            const verdict = document.getElementById('levVerdict');
+            const levItem = document.getElementById('effLev').parentElement;
+
+            if (effectiveLeverage > 30) {
+                verdict.innerHTML = `<span style="color: var(--accent)">CRITICAL RISK:</span> You are controlling 30x more than your account value. One small move could liquidate you.`;
+                levItem.style.borderColor = "var(--accent)";
+            } else if (effectiveLeverage > 10) {
+                verdict.innerHTML = `<span style="color: #ffaa00">AGGRESSIVE:</span> High market exposure. Ensure your Stop Loss is tight.`;
+                levItem.style.borderColor = "#ffaa00";
+            } else {
+                verdict.innerHTML = `<span style="color: var(--primary)">CONSERVATIVE:</span> This is a professional level of exposure. Lower risk of margin call.`;
+                levItem.style.borderColor = "var(--primary)";
+            }
+
+            document.getElementById('levResults').classList.add('show');
+        });
+
+        function resetLev() {
+            document.getElementById('levForm').reset();
+            document.getElementById('levResults').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

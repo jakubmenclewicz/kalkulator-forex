@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fibonacci Calculator - TRADE FLOW</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">◢ TRADE FLOW ◣</a>
+            <ul class="nav-links">
+                <li><a href="/">MENU</a></li>
+                <li><a href="/position-size">POS SIZE</a></li>
+                <li><a href="/fibonacci" class="active">FIBONACCI</a></li>
+                <li><a href="/margin">MARGIN</a></li>
+                <li><a href="/risk-reward">R/R</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="header">
+        <h1>◢ FIBONACCI RETRACEMENT ◣</h1>
+        <p>Technical analysis engine for key reversal levels</p>
+    </div>
+
+    <div class="container">
+        <div class="form-wrapper">
+            <div class="form-section">
+                <h3>❯❯ MARKET DATA</h3>
+                <form id="fibForm">
+                    <div class="form-group">
+                        <label>TREND DIRECTION</label>
+                        <select id="trendDir">
+                            <option value="up">UPTREND (Low to High)</option>
+                            <option value="down">DOWNTREND (High to Low)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>SWING HIGH PRICE</label>
+                        <input type="number" id="highPrice" step="0.00001" placeholder="e.g. 1.12450" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>SWING LOW PRICE</label>
+                        <input type="number" id="lowPrice" step="0.00001" placeholder="e.g. 1.08500" required>
+                    </div>
+
+                    <button type="submit" class="btn">◢ GENERATE FIB LEVELS ◣</button>
+                    <button type="button" class="btn" style="background: var(--gray); color: var(--light); margin-top: 10px;" onclick="resetFib()">⟲ RESET SYSTEM</button>
+                </form>
+            </div>
+
+            <div class="result-section" id="fibResults">
+                <div class="alert">
+                    <h4 id="resTitle">▸ ANALYSIS COMPLETE</h4>
+                    <p style="font-size: 11px; opacity: 0.7;" id="resSub">Potential Support/Resistance Levels</p>
+                </div>
+
+                <table class="result-table">
+                    <thead>
+                        <tr>
+                            <th>RATIO</th>
+                            <th>PRICE LEVEL</th>
+                            <th>TYPE</th>
+                        </tr>
+                    </thead>
+                    <tbody id="fibTableBody">
+                        </tbody>
+                </table>
+
+                <div class="info-box" style="margin-top: 20px;">
+                    <h4 style="color: var(--primary);">◢ TRADING NOTE</h4>
+                    <p style="font-size: 12px;">The 61.8% level (Golden Ratio) is the most critical area for institutional price action. Watch for candlestick confirmations.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <footer class="footer">
+        <p>◢ TRADE FLOW - Professional Trading Tools ◣</p>
+    </footer>
+
+    <script>
+        document.getElementById('fibForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const high = parseFloat(document.getElementById('highPrice').value);
+            const low = parseFloat(document.getElementById('lowPrice').value);
+            const trend = document.getElementById('trendDir').value;
+            const tableBody = document.getElementById('fibTableBody');
+            
+            if (isNaN(high) || isNaN(low)) return;
+
+            const diff = high - low;
+            const ratios = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1];
+            tableBody.innerHTML = '';
+
+            ratios.forEach(ratio => {
+                let price;
+                if (trend === 'up') {
+                    price = high - (diff * ratio);
+                } else {
+                    price = low + (diff * ratio);
+                }
+
+                const row = document.createElement('tr');
+                const isGolden = ratio === 0.618;
+                
+                row.innerHTML = `
+                    <td style="${isGolden ? 'color: var(--primary); font-weight: bold;' : ''}">${(ratio * 100).toFixed(1)}%</td>
+                    <td style="${isGolden ? 'color: var(--primary); font-weight: bold;' : ''}">${price.toFixed(5)}</td>
+                    <td style="font-size: 10px; opacity: 0.6;">${ratio === 0.5 ? 'PSYCHOLOGICAL' : (isGolden ? 'GOLDEN RATIO' : 'LEVEL')}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            document.getElementById('fibResults').classList.add('show');
+            document.getElementById('resTitle').textContent = `▸ ${trend.toUpperCase()} LEVELS GENERATED`;
+        });
+
+        function resetFib() {
+            document.getElementById('fibForm').reset();
+            document.getElementById('fibResults').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

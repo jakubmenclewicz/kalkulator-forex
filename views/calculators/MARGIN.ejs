@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Margin Calculator - Trade Flow</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">◢ TRADE FLOW ◣</a>
+            <ul class="nav-links">
+                <li><a href="/">MENU</a></li>
+                <li><a href="/position-size">POS SIZE</a></li>
+                <li><a href="/pip-value">PIP VAL</a></li>
+                <li><a href="/margin" class="active">MARGIN</a></li>
+                <li><a href="/profit-loss">P/L</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="header">
+        <h1>◢ MARGIN CALCULATOR ◣</h1>
+        <p>Analyze capital collateral and total exposure</p>
+    </div>
+
+    <div class="container">
+        <div class="form-wrapper">
+            <div class="form-section">
+                <h3>❯❯ SYSTEM PARAMETERS</h3>
+                <form id="marginForm">
+                    <div class="form-group">
+                        <label>ACCOUNT CURRENCY</label>
+                        <select id="accCurr">
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="PLN">PLN (zł)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>LEVERAGE RATIO</label>
+                        <select id="leverage">
+                            <option value="30">1:30 (Retail)</option>
+                            <option value="100">1:100 (Professional)</option>
+                            <option value="200">1:200</option>
+                            <option value="500">1:500 (High Risk)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>POSITION SIZE (LOTS)</label>
+                        <input type="number" id="lots" value="1.0" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>ASSET PRICE (e.g. 1.0850)</label>
+                        <input type="number" id="price" value="1.0000" step="0.0001" required>
+                    </div>
+
+                    <button type="submit" class="btn">◢ CALCULATE DEPOSIT ◣</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetMargin()">⟲ RESET SYSTEM</button>
+                </form>
+            </div>
+
+            <div class="result-section" id="results">
+                <div class="alert alert-success">
+                    <h4 style="color: var(--primary); margin-bottom: 10px;">▸ REQUIRED MARGIN:</h4>
+                    <div class="result-value" id="marginDisplay" style="font-size: 42px;">$ 0.00</div>
+                </div>
+
+                <div class="result-grid">
+                    <div class="result-item">
+                        <span class="result-label">NOTIONAL VALUE</span>
+                        <span class="result-value neutral" id="notionalVal" style="font-size: 18px;">$ 0.00</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">MARGIN USED</span>
+                        <span class="result-value" id="marginPercent" style="font-size: 18px;">0.00%</span>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h4>◢ STATUS REPORT</h4>
+                    <p id="marginTip">Enter trade details to analyze required collateral and leverage exposure.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>◢ TRADE FLOW - Professional Trading Tools ◣</p>
+    </div>
+
+    <script>
+        const form = document.getElementById('marginForm');
+        
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const lots = parseFloat(document.getElementById('lots').value);
+            const leverage = parseFloat(document.getElementById('leverage').value);
+            const price = parseFloat(document.getElementById('price').value);
+            const curr = document.getElementById('accCurr').value;
+            const symbols = { 'USD': '$', 'EUR': '€', 'PLN': 'zł' };
+
+            // Logic
+            const contractSize = 100000; // Standard Lot
+            const notionalValue = lots * contractSize * price;
+            const requiredMargin = notionalValue / leverage;
+            const marginPercentage = (1 / leverage) * 100;
+
+            // Display
+            document.getElementById('marginDisplay').textContent = `${symbols[curr]} ${requiredMargin.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('notionalVal').textContent = `${symbols[curr]} ${notionalValue.toLocaleString()}`;
+            document.getElementById('marginPercent').textContent = marginPercentage.toFixed(2) + '%';
+
+            // Show result section with your CSS animation
+            document.getElementById('results').classList.add('show');
+            
+            // Dynamic Risk Tip
+            const tip = document.getElementById('marginTip');
+            if (leverage >= 200) {
+                tip.innerHTML = "<span style='color: var(--accent)'>CRITICAL: High leverage detected. Margin Call risk is elevated.</span>";
+            } else {
+                tip.innerHTML = "Margin requirements calculated based on " + leverage + ":1 leverage.";
+            }
+        });
+
+        function resetMargin() {
+            form.reset();
+            document.getElementById('results').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

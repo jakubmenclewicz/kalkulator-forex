@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Risk Calculator - TradeFlow</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">◢ TRADEFLOW ◣</a>
+            <ul class="nav-links">
+                <li><a href="/">HOME</a></li>
+                <li><a href="/position-size">POSITION</a></li>
+                <li><a href="/portfolio-risk" class="active">PORTFOLIO</a></li>
+                <li><a href="/breakeven">BREAKEVEN</a></li>
+                <li><a href="/risk-reward">R/R</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="header">
+        <h1>◢ PORTFOLIO RISK CALCULATOR ◣</h1>
+        <p>Calculate Total Risk Across Multiple Open Positions</p>
+    </div>
+
+    <div class="container">
+        
+        <div class="info-box">
+            <h4>▸▸ WHAT IS PORTFOLIO RISK?</h4>
+            <p>Portfolio Risk calculates your total exposure across multiple open positions. Professional traders need to manage their overall account risk, not just individual trade risk. This calculator helps you see the big picture of your trading portfolio.</p>
+        </div>
+
+        <div class="form-wrapper">
+            <div class="form-section">
+                <h3>▸▸ ACCOUNT DETAILS</h3>
+                
+                <form id="portfolioForm">
+                    <div class="form-group">
+                        <label>ACCOUNT BALANCE ($)</label>
+                        <input type="number" name="accountBalance" value="10000" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>MAX TOTAL RISK (%)</label>
+                        <input type="number" name="maxTotalRisk" value="6" step="0.1" min="1" max="20" required>
+                    </div>
+
+                    <h3 style="margin-top: 30px; margin-bottom: 20px;">▸▸ OPEN POSITIONS</h3>
+
+                    <!-- Position 1 -->
+                    <div class="position-group" style="border-left: 3px solid var(--primary); padding-left: 15px; margin-bottom: 25px;">
+                        <h4 style="color: var(--primary); margin-bottom: 15px;">POSITION 1</h4>
+                        <div class="form-group">
+                            <label>PAIR</label>
+                            <select name="pair1">
+                                <option value="EURUSD">EUR/USD</option>
+                                <option value="GBPUSD">GBP/USD</option>
+                                <option value="USDJPY">USD/JPY</option>
+                                <option value="AUDUSD">AUD/USD</option>
+                                <option value="USDCAD">USD/CAD</option>
+                                <option value="NZDUSD">NZD/USD</option>
+                                <option value="EURGBP">EUR/GBP</option>
+                                <option value="EURJPY">EUR/JPY</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>RISK AMOUNT ($)</label>
+                            <input type="number" name="risk1" value="200" step="0.01" required>
+                        </div>
+                    </div>
+
+                    <!-- Position 2 -->
+                    <div class="position-group" style="border-left: 3px solid var(--primary); padding-left: 15px; margin-bottom: 25px;">
+                        <h4 style="color: var(--primary); margin-bottom: 15px;">POSITION 2</h4>
+                        <div class="form-group">
+                            <label>PAIR</label>
+                            <select name="pair2">
+                                <option value="NONE">--- NONE ---</option>
+                                <option value="EURUSD">EUR/USD</option>
+                                <option value="GBPUSD">GBP/USD</option>
+                                <option value="USDJPY">USD/JPY</option>
+                                <option value="AUDUSD">AUD/USD</option>
+                                <option value="USDCAD">USD/CAD</option>
+                                <option value="NZDUSD">NZD/USD</option>
+                                <option value="EURGBP">EUR/GBP</option>
+                                <option value="EURJPY">EUR/JPY</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>RISK AMOUNT ($)</label>
+                            <input type="number" name="risk2" value="0" step="0.01">
+                        </div>
+                    </div>
+
+                    <!-- Position 3 -->
+                    <div class="position-group" style="border-left: 3px solid var(--primary); padding-left: 15px; margin-bottom: 25px;">
+                        <h4 style="color: var(--primary); margin-bottom: 15px;">POSITION 3</h4>
+                        <div class="form-group">
+                            <label>PAIR</label>
+                            <select name="pair3">
+                                <option value="NONE">--- NONE ---</option>
+                                <option value="EURUSD">EUR/USD</option>
+                                <option value="GBPUSD">GBP/USD</option>
+                                <option value="USDJPY">USD/JPY</option>
+                                <option value="AUDUSD">AUD/USD</option>
+                                <option value="USDCAD">USD/CAD</option>
+                                <option value="NZDUSD">NZD/USD</option>
+                                <option value="EURGBP">EUR/GBP</option>
+                                <option value="EURJPY">EUR/JPY</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>RISK AMOUNT ($)</label>
+                            <input type="number" name="risk3" value="0" step="0.01">
+                        </div>
+                    </div>
+
+                    <!-- Position 4 -->
+                    <div class="position-group" style="border-left: 3px solid var(--primary); padding-left: 15px; margin-bottom: 25px;">
+                        <h4 style="color: var(--primary); margin-bottom: 15px;">POSITION 4</h4>
+                        <div class="form-group">
+                            <label>PAIR</label>
+                            <select name="pair4">
+                                <option value="NONE">--- NONE ---</option>
+                                <option value="EURUSD">EUR/USD</option>
+                                <option value="GBPUSD">GBP/USD</option>
+                                <option value="USDJPY">USD/JPY</option>
+                                <option value="AUDUSD">AUD/USD</option>
+                                <option value="USDCAD">USD/CAD</option>
+                                <option value="NZDUSD">NZD/USD</option>
+                                <option value="EURGBP">EUR/GBP</option>
+                                <option value="EURJPY">EUR/JPY</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>RISK AMOUNT ($)</label>
+                            <input type="number" name="risk4" value="0" step="0.01">
+                        </div>
+                    </div>
+
+                    <!-- Position 5 -->
+                    <div class="position-group" style="border-left: 3px solid var(--primary); padding-left: 15px; margin-bottom: 25px;">
+                        <h4 style="color: var(--primary); margin-bottom: 15px;">POSITION 5</h4>
+                        <div class="form-group">
+                            <label>PAIR</label>
+                            <select name="pair5">
+                                <option value="NONE">--- NONE ---</option>
+                                <option value="EURUSD">EUR/USD</option>
+                                <option value="GBPUSD">GBP/USD</option>
+                                <option value="USDJPY">USD/JPY</option>
+                                <option value="AUDUSD">AUD/USD</option>
+                                <option value="USDCAD">USD/CAD</option>
+                                <option value="NZDUSD">NZD/USD</option>
+                                <option value="EURGBP">EUR/GBP</option>
+                                <option value="EURJPY">EUR/JPY</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>RISK AMOUNT ($)</label>
+                            <input type="number" name="risk5" value="0" step="0.01">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn">◢ CALCULATE PORTFOLIO RISK ◣</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">⟲ RESET</button>
+                </form>
+            </div>
+
+            <div class="result-section" id="results">
+                <h3>▸▸ PORTFOLIO RISK ANALYSIS</h3>
+                
+                <div class="alert alert-success" id="mainResult">
+                    <h4 style="margin-bottom: 10px;">▸ TOTAL PORTFOLIO RISK:</h4>
+                    <div style="font-size: 36px; font-weight: bold; margin: 15px 0;" id="totalRiskDisplay">$0.00</div>
+                    <div style="font-size: 24px; font-weight: bold;" id="totalRiskPercent">0.00%</div>
+                </div>
+
+                <div class="result-grid">
+                    <div class="result-item">
+                        <span class="result-label">TOTAL RISK ($)</span>
+                        <span class="result-value negative" id="totalRisk">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">TOTAL RISK (%)</span>
+                        <span class="result-value negative" id="totalRiskPct">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">ACTIVE POSITIONS</span>
+                        <span class="result-value neutral" id="activePositions">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">REMAINING CAPACITY</span>
+                        <span class="result-value positive" id="remainingCapacity">-</span>
+                    </div>
+                </div>
+
+                <div id="correlationInfo"></div>
+                <div id="riskWarning"></div>
+
+                <div class="result-section show" style="margin-top: 25px;">
+                    <h3>▸▸ POSITION BREAKDOWN</h3>
+                    <table class="result-table" id="positionTable">
+                        <thead>
+                            <tr>
+                                <th>POSITION</th>
+                                <th>PAIR</th>
+                                <th>RISK ($)</th>
+                                <th>% OF TOTAL RISK</th>
+                            </tr>
+                        </thead>
+                        <tbody id="positionTableBody">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="info-box" style="margin-top: 25px;">
+                    <h4>▸▸ CORRELATION WARNINGS</h4>
+                    <div id="correlationWarnings">
+                        <p style="opacity: 0.7;">Calculating correlations...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-section show" style="margin-top: 40px;">
+            <h3>▸▸ CORRELATION GUIDE</h3>
+            <table class="result-table">
+                <thead>
+                    <tr>
+                        <th>PAIR 1</th>
+                        <th>PAIR 2</th>
+                        <th>CORRELATION</th>
+                        <th>RISK FACTOR</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>EUR/USD</td>
+                        <td>GBP/USD</td>
+                        <td style="color: var(--accent);">HIGH (+0.85)</td>
+                        <td>⚠ High overlap risk</td>
+                    </tr>
+                    <tr>
+                        <td>EUR/USD</td>
+                        <td>USD/CHF</td>
+                        <td style="color: var(--accent);">NEGATIVE (-0.90)</td>
+                        <td>⚠ Inverse correlation</td>
+                    </tr>
+                    <tr>
+                        <td>EUR/USD</td>
+                        <td>USD/JPY</td>
+                        <td style="color: #ffc800;">MEDIUM (-0.45)</td>
+                        <td>✓ Moderate diversification</td>
+                    </tr>
+                    <tr>
+                        <td>EUR/USD</td>
+                        <td>AUD/USD</td>
+                        <td style="color: var(--primary);">LOW (+0.30)</td>
+                        <td>✓ Good diversification</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p>◢ TRADEFLOW - Professional Forex Trading Calculators ◣</p>
+    </div>
+
+    <script>
+        const form = document.getElementById('portfolioForm');
+        
+        // Correlation matrix (simplified)
+        const correlations = {
+            'EURUSD-GBPUSD': 0.85,
+            'EURUSD-USDJPY': -0.45,
+            'EURUSD-AUDUSD': 0.70,
+            'EURUSD-USDCAD': -0.80,
+            'EURUSD-NZDUSD': 0.65,
+            'GBPUSD-AUDUSD': 0.75,
+            'GBPUSD-USDJPY': -0.40,
+            'USDJPY-AUDUSD': -0.35,
+            'AUDUSD-NZDUSD': 0.90,
+        };
+
+        function getCorrelation(pair1, pair2) {
+            const key1 = `${pair1}-${pair2}`;
+            const key2 = `${pair2}-${pair1}`;
+            return correlations[key1] || correlations[key2] || 0;
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+            
+            calculatePortfolioRisk(data);
+        });
+
+        function calculatePortfolioRisk(data) {
+            const accountBalance = parseFloat(data.accountBalance);
+            const maxTotalRisk = parseFloat(data.maxTotalRisk);
+            
+            // Collect active positions
+            const positions = [];
+            for (let i = 1; i <= 5; i++) {
+                const pair = data[`pair${i}`];
+                const risk = parseFloat(data[`risk${i}`]) || 0;
+                
+                if (pair !== 'NONE' && risk > 0) {
+                    positions.push({
+                        number: i,
+                        pair: pair,
+                        risk: risk,
+                        riskPct: (risk / accountBalance) * 100
+                    });
+                }
+            }
+
+            // Calculate totals
+            const totalRisk = positions.reduce((sum, pos) => sum + pos.risk, 0);
+            const totalRiskPct = (totalRisk / accountBalance) * 100;
+            const maxRiskAmount = (accountBalance * maxTotalRisk) / 100;
+            const remainingCapacity = maxRiskAmount - totalRisk;
+
+            // Display results
+            document.getElementById('results').classList.add('show');
+            document.getElementById('totalRiskDisplay').textContent = '$' + totalRisk.toFixed(2);
+            document.getElementById('totalRiskPercent').textContent = totalRiskPct.toFixed(2) + '% of account';
+            document.getElementById('totalRisk').textContent = '$' + totalRisk.toFixed(2);
+            document.getElementById('totalRiskPct').textContent = totalRiskPct.toFixed(2) + '%';
+            document.getElementById('activePositions').textContent = positions.length;
+            document.getElementById('remainingCapacity').textContent = '$' + remainingCapacity.toFixed(2);
+
+            // Risk warning
+            let warningHTML = '';
+            if (totalRiskPct > maxTotalRisk) {
+                warningHTML = `<div class="alert alert-danger">
+                    <h4>⚠ RISK LIMIT EXCEEDED</h4>
+                    <p>Your total risk (${totalRiskPct.toFixed(2)}%) exceeds your maximum limit (${maxTotalRisk}%). Consider reducing position sizes or closing some positions.</p>
+                </div>`;
+            } else if (totalRiskPct > maxTotalRisk * 0.8) {
+                warningHTML = `<div class="alert alert-warning">
+                    <h4>⚠ APPROACHING RISK LIMIT</h4>
+                    <p>You're using ${((totalRiskPct / maxTotalRisk) * 100).toFixed(0)}% of your maximum risk allowance. Be cautious about opening new positions.</p>
+                </div>`;
+            } else {
+                warningHTML = `<div class="alert alert-success">
+                    <h4>✓ RISK WITHIN LIMITS</h4>
+                    <p>Your portfolio risk is well managed. You have $${remainingCapacity.toFixed(2)} (${(remainingCapacity / accountBalance * 100).toFixed(2)}%) available for new positions.</p>
+                </div>`;
+            }
+            document.getElementById('riskWarning').innerHTML = warningHTML;
+
+            // Position breakdown table
+            let tableHTML = '';
+            positions.forEach(pos => {
+                const pctOfTotal = (pos.risk / totalRisk) * 100;
+                tableHTML += `
+                    <tr>
+                        <td>Position ${pos.number}</td>
+                        <td>${pos.pair}</td>
+                        <td>$${pos.risk.toFixed(2)}</td>
+                        <td>${pctOfTotal.toFixed(1)}%</td>
+                    </tr>
+                `;
+            });
+            document.getElementById('positionTableBody').innerHTML = tableHTML;
+
+            // Correlation analysis
+            let correlationHTML = '';
+            const correlatedPairs = [];
+            
+            for (let i = 0; i < positions.length; i++) {
+                for (let j = i + 1; j < positions.length; j++) {
+                    const corr = getCorrelation(positions[i].pair, positions[j].pair);
+                    if (Math.abs(corr) > 0.6) {
+                        correlatedPairs.push({
+                            pair1: positions[i].pair,
+                            pair2: positions[j].pair,
+                            correlation: corr,
+                            combinedRisk: positions[i].risk + positions[j].risk
+                        });
+                    }
+                }
+            }
+
+            if (correlatedPairs.length > 0) {
+                correlationHTML = '<p><strong>⚠ HIGH CORRELATION DETECTED:</strong></p>';
+                correlatedPairs.forEach(cp => {
+                    const corrType = cp.correlation > 0 ? 'POSITIVE' : 'NEGATIVE';
+                    correlationHTML += `
+                        <p style="margin: 8px 0; padding: 10px; background: rgba(255, 0, 85, 0.1); border-left: 3px solid var(--accent);">
+                            ${cp.pair1} & ${cp.pair2}: ${corrType} correlation (${cp.correlation.toFixed(2)})<br>
+                            Combined risk: $${cp.combinedRisk.toFixed(2)} - These positions may move together
+                        </p>
+                    `;
+                });
+            } else {
+                correlationHTML = '<p style="color: var(--primary);">✓ Good diversification - No high correlations detected</p>';
+            }
+            
+            document.getElementById('correlationWarnings').innerHTML = correlationHTML;
+
+            // Diversification score
+            const diversificationScore = Math.max(0, 100 - (correlatedPairs.length * 25));
+            const diversHTML = `
+                <div class="result-grid" style="margin-top: 20px;">
+                    <div class="result-item">
+                        <span class="result-label">DIVERSIFICATION SCORE</span>
+                        <span class="result-value ${diversificationScore > 70 ? 'positive' : diversificationScore > 40 ? 'neutral' : 'negative'}">${diversificationScore}/100</span>
+                    </div>
+                </div>
+            `;
+            document.getElementById('correlationInfo').innerHTML = diversHTML;
+        }
+
+        function resetForm() {
+            form.reset();
+            document.getElementById('results').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profit / Loss - Trade Flow</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .calc-container { margin-bottom: 50px; }
+        .divider { border-top: 2px dashed rgba(255,255,255,0.1); margin: 40px 0; position: relative; }
+        .divider span { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #1a1a1a; padding: 0 15px; color: #888; font-size: 12px; letter-spacing: 2px; }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">◢ TRADE FLOW ◣</a>
+            <ul class="nav-links">
+                <li><a href="/">MENU</a></li>
+                <li><a href="/position-size">POSITION SIZE</a></li>
+                <li><a href="/stop-loss-take-profit">SL/TP</a></li>
+                <li><a href="/profit-loss" class="active">P/L</a></li>
+                <li><a href="/risk-reward">RISK/REWARD</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>◢ PROFIT / LOSS CALCULATORS ◣</h1>
+            <p>Fast estimation or detailed price analysis</p>
+        </div>
+
+        <div class="calc-container">
+            <div class="form-wrapper">
+                <div class="form-section">
+                    <h3>❯❯ QUICK ESTIMATION (PIPS)</h3>
+                    <form id="quickCalcForm">
+                        <div class="form-group">
+                            <label>LOT SIZE</label>
+                            <input type="number" id="qLots" value="1.0" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label>PIP DISTANCE</label>
+                            <input type="number" id="qPips" value="50" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>PIP VALUE (FOR 1 LOT)</label>
+                            <input type="number" id="qPipVal" value="10" step="0.01" required>
+                        </div>
+                        <button type="submit" class="btn">◢ QUICK CALCULATE ◣</button>
+                    </form>
+                </div>
+
+                <div class="result-section" id="quickResults">
+                    <div class="alert alert-success">
+                        <h4>▸ ESTIMATED P/L:</h4>
+                        <div style="font-size: 32px; font-weight: 900;" id="qTotalPL">$ 0.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider"><span>OR</span></div>
+
+        <div class="calc-container">
+            <div class="form-wrapper">
+                <div class="form-section">
+                    <h3>❯❯ DETAILED ANALYSIS (PRICE)</h3>
+                    <form id="detailedCalcForm">
+                        <div class="form-group">
+                            <label>TRADE DIRECTION</label>
+                            <select id="dDir">
+                                <option value="buy">BUY (LONG)</option>
+                                <option value="sell">SELL (SHORT)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>LOT SIZE</label>
+                            <input type="number" id="dLots" value="1.0" step="0.01" required>
+                        </div>
+                        <div class="grid-inputs" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="form-group">
+                                <label>ENTRY PRICE</label>
+                                <input type="number" id="dEntry" value="1.10000" step="0.00001" required>
+                            </div>
+                            <div class="form-group">
+                                <label>EXIT PRICE</label>
+                                <input type="number" id="dExit" value="1.10500" step="0.00001" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>PIP VALUE (FOR 1 LOT)</label>
+                            <input type="number" id="dPipVal" value="10" step="0.01" required>
+                        </div>
+                        <button type="submit" class="btn">◢ DETAILED CALCULATE ◣</button>
+                    </form>
+                </div>
+
+                <div class="result-section" id="detailedResults">
+                    <div class="alert" id="dAlertBox">
+                        <h4 id="dStatusLabel">▸ RESULT:</h4>
+                        <div style="font-size: 32px; font-weight: 900;" id="dTotalPL">$ 0.00</div>
+                        <div id="dPipsGain" style="margin-top: 5px; opacity: 0.8;">0 Pips</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>◢ FOREX CALCULATORS - Professional Trading Tools ◣</p>
+    </div>
+
+    <script>
+        // Logika Kalkulatora 1 (Quick)
+        document.getElementById('quickCalcForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const lots = parseFloat(document.getElementById('qLots').value);
+            const pips = parseFloat(document.getElementById('qPips').value);
+            const val = parseFloat(document.getElementById('qPipVal').value);
+            const total = lots * pips * val;
+            
+            document.getElementById('qTotalPL').textContent = '$' + total.toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('quickResults').classList.add('show');
+        });
+
+        // Logika Kalkulatora 2 (Detailed)
+        document.getElementById('detailedCalcForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const dir = document.getElementById('dDir').value;
+            const lots = parseFloat(document.getElementById('dLots').value);
+            const entry = parseFloat(document.getElementById('dEntry').value);
+            const exit = parseFloat(document.getElementById('dExit').value);
+            const pipVal = parseFloat(document.getElementById('dPipVal').value);
+
+            // Wykrywanie czy to JPY (prosta heurystyka po cenie)
+            const isJpy = entry < 500;
+            const multiplier = isJpy ? 100 : 10000;
+            
+            let pipDiff = dir === 'buy' ? (exit - entry) * multiplier : (entry - exit) * multiplier;
+            const totalMoney = pipDiff * lots * pipVal;
+
+            // UI
+            const alertBox = document.getElementById('dAlertBox');
+            document.getElementById('dTotalPL').textContent = (totalMoney >= 0 ? '$' : '-$') + Math.abs(totalMoney).toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('dPipsGain').textContent = (pipDiff >= 0 ? '+' : '') + pipDiff.toFixed(1) + ' Pips';
+            
+            alertBox.className = totalMoney >= 0 ? 'alert alert-success' : 'alert alert-danger';
+            document.getElementById('dStatusLabel').textContent = totalMoney >= 0 ? '▸ TOTAL PROFIT:' : '▸ TOTAL LOSS:';
+            
+            document.getElementById('detailedResults').classList.add('show');
+        });
+    </script>
+</body>
+</html>

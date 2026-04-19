@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compounding Simulator - TRADE FLOW</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .progress-bar-container {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.05);
+            margin-top: 4px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+            transition: width 0.5s ease-out;
+        }
+        .stat-card {
+            background: var(--dark);
+            border-left: 3px solid var(--primary);
+            padding: 10px 15px;
+            margin-top: 10px;
+        }
+        .goal-highlight {
+            background: rgba(0, 255, 136, 0.1) !important;
+            border-left: 2px solid var(--primary);
+        }
+        .step-row:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">◢ TRADE FLOW ◣</a>
+            <ul class="nav-links">
+                <li><a href="/">MENU</a></li>
+                <li><a href="/compounding" class="active">COMPOUNDING</a></li>
+                <li><a href="/risk-reward">R/R</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="header">
+        <h1>◢ COMPOUNDING SIMULATOR ◣</h1>
+        <p>Exponential capital growth & cashflow engine</p>
+    </div>
+
+    <div class="container">
+        <div class="form-wrapper" style="grid-template-columns: 350px 1fr; gap: 30px;">
+            <div class="form-section">
+                <h3>❯❯ SIMULATION PARAMETERS</h3>
+                <form id="compoundForm">
+                    <div class="form-group">
+                        <label>INITIAL INVESTMENT ($)</label>
+                        <input type="number" id="startBalance" value="5000" step="any" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>INTEREST RATE (%)</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="number" id="gainPercent" step="0.01" value="5.0" required>
+                            <select id="ratePeriod" style="width: 120px;">
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly" selected>Monthly</option>
+                                <option value="annual">Annual</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>DURATION (STEPS)</label>
+                        <input type="number" id="periods" value="12" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>REGULAR CONTRIBUTIONS</label>
+                        <select id="contributionType" onchange="toggleInputs()">
+                            <option value="none">None</option>
+                            <option value="deposit">Deposits (+)</option>
+                            <option value="withdrawal">Withdrawals (-)</option>
+                            <option value="both">Both (+/-)</option>
+                        </select>
+                    </div>
+
+                    <div id="depositGroup" class="form-group" style="display: none;">
+                        <label>DEPOSIT AMOUNT ($)</label>
+                        <input type="number" id="monthlyDep" value="0" step="any">
+                    </div>
+
+                    <div id="withdrawalGroup" class="form-group" style="display: none;">
+                        <label>WITHDRAWAL AMOUNT ($)</label>
+                        <input type="number" id="monthlyWith" value="0" step="any">
+                    </div>
+
+                    <button type="submit" class="btn">◢ EXECUTE SIMULATION ◣</button>
+                    <button type="button" class="btn" style="background: var(--gray); color: var(--light); margin-top: 10px;" onclick="resetCompound()">⟲ RESET SYSTEM</button>
+                </form>
+            </div>
+
+            <div class="result-section" id="compoundResults">
+                <div class="alert">
+                    <h4 id="resTitle">▸ PROJECTION COMPLETE</h4>
+                    <p style="font-size: 11px; opacity: 0.7;" id="modelType">Compound interest model applied</p>
+                </div>
+
+                <div class="result-grid">
+                    <div class="result-item">
+                        <span class="result-label">FINAL BALANCE</span>
+                        <span class="result-value" id="finalBalance">$ 0.00</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">TOTAL PROFIT</span>
+                        <span class="result-value" id="totalProfit" style="color: #ff9f43;">$ 0.00</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">TOTAL ROI</span>
+                        <span class="result-value" id="totalReturnPerc" style="color: #48dbfb;">0%</span>
+                    </div>
+                </div>
+
+                <div style="max-height: 400px; overflow-y: auto; border: 1px solid var(--border); background: rgba(0,0,0,0.2);">
+                    <table class="result-table">
+                        <thead>
+                            <tr>
+                                <th>Period</th>
+                                <th>New Balance</th>
+                                <th>Interest</th>
+                                <th>Net Cashflow</th>
+                            </tr>
+                        </thead>
+                        <tbody id="compoundTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleInputs() {
+            const type = document.getElementById('contributionType').value;
+            document.getElementById('depositGroup').style.display = (type === 'deposit' || type === 'both') ? 'block' : 'none';
+            document.getElementById('withdrawalGroup').style.display = (type === 'withdrawal' || type === 'both') ? 'block' : 'none';
+        }
+
+        document.getElementById('compoundForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            let balance = parseFloat(document.getElementById('startBalance').value);
+            const initialBalance = balance;
+            const rate = parseFloat(document.getElementById('gainPercent').value) / 100;
+            const periods = parseInt(document.getElementById('periods').value);
+            const type = document.getElementById('contributionType').value;
+            const stepLabel = document.getElementById('ratePeriod').value.charAt(0).toUpperCase() + document.getElementById('ratePeriod').value.slice(1, -2);
+            
+            const depAmount = (type === 'deposit' || type === 'both') ? parseFloat(document.getElementById('monthlyDep').value || 0) : 0;
+            const withAmount = (type === 'withdrawal' || type === 'both') ? parseFloat(document.getElementById('monthlyWith').value || 0) : 0;
+            
+            const tableBody = document.getElementById('compoundTableBody');
+            tableBody.innerHTML = '';
+            
+            let totalInterest = 0;
+            let currentBalance = balance;
+
+            // Obliczamy max dla pasków postępu
+            let tempBalance = balance;
+            let maxBalance = balance;
+            for(let j=0; j<periods; j++) {
+                tempBalance += (tempBalance * rate) + depAmount - withAmount;
+                if(tempBalance > maxBalance) maxBalance = tempBalance;
+            }
+
+            for (let i = 1; i <= periods; i++) {
+                let interest = currentBalance * rate;
+                let netFlow = depAmount - withAmount;
+                currentBalance += interest + netFlow;
+                
+                if (currentBalance < 0) currentBalance = 0;
+                totalInterest += interest;
+
+                const progressWidth = maxBalance > 0 ? (currentBalance / maxBalance) * 100 : 0;
+
+                const row = document.createElement('tr');
+                row.className = 'step-row';
+                row.innerHTML = `
+                    <td style="font-size: 11px; opacity: 0.6;">STEP ${i}</td>
+                    <td>
+                        <div style="color: var(--primary); font-weight: bold;">$ ${currentBalance.toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
+                        <div class="progress-bar-container"><div class="progress-fill" style="width: ${progressWidth}%"></div></div>
+                    </td>
+                    <td style="color: #ff9f43; font-size: 12px;">+ $ ${interest.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                    <td style="opacity: 0.7; font-size: 12px; color: ${netFlow >= 0 ? 'var(--primary)' : '#ff4757'}">
+                        ${netFlow >= 0 ? '+' : ''}$ ${netFlow.toLocaleString()}
+                    </td>
+                `;
+                tableBody.appendChild(row);
+                if (currentBalance <= 0) break;
+            }
+
+            document.getElementById('finalBalance').textContent = `$ ${currentBalance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('totalProfit').textContent = `$ ${totalInterest.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('totalReturnPerc').textContent = `${((currentBalance / initialBalance - 1) * 100).toFixed(2)}%`;
+            document.getElementById('compoundResults').classList.add('show');
+        });
+
+        function resetCompound() {
+            document.getElementById('compoundForm').reset();
+            toggleInputs();
+            document.getElementById('compoundTableBody').innerHTML = '';
+            document.getElementById('compoundResults').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

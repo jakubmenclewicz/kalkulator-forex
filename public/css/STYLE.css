@@ -1,0 +1,424 @@
+/* =========================
+   FUNDAMENTY
+========================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #00ff88;
+    --primary-glow: rgba(0, 255, 136, 0.4);
+    --secondary: #0a0e27;
+    --accent: #ff0055;
+    --accent-glow: rgba(255, 0, 85, 0.4);
+    --dark: #050814;
+    --light: #f0f0f0;
+    --gray: #161b33;
+    --border: rgba(0, 255, 136, 0.2);
+    --font-main: 'Courier New', monospace;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* =========================
+   SCROLLBAR
+========================= */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--dark); }
+::-webkit-scrollbar-thumb {
+    background: var(--gray);
+    border: 1px solid var(--primary);
+}
+
+/* =========================
+   BODY / LAYOUT
+========================= */
+body {
+    font-family: var(--font-main);
+    background: var(--dark);
+    color: var(--light);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* =========================
+   NAVIGACJA
+========================= */
+.nav {
+    background: rgba(10, 14, 39, 0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 2px solid var(--primary);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-container {
+    max-width: 1300px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+}
+
+.nav-logo {
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--primary);
+    text-decoration: none;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px var(--primary-glow);
+}
+
+.nav-links {
+    display: flex;
+    gap: 10px;
+    list-style: none;
+}
+
+.nav-links a {
+    color: var(--light);
+    text-decoration: none;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    transition: var(--transition);
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: bold;
+    clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    background: var(--primary);
+    color: var(--dark);
+    box-shadow: 0 0 15px var(--primary-glow);
+    border-color: var(--primary);
+}
+
+/* =========================
+   HEADER
+========================= */
+.header {
+    text-align: center;
+    padding: 70px 20px;
+    background: radial-gradient(circle at center, var(--secondary) 0%, var(--dark) 100%);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 50px;
+}
+
+.header h1 {
+    font-size: clamp(30px, 5vw, 56px);
+    color: var(--primary);
+    letter-spacing: 5px;
+    margin-bottom: 12px;
+    text-shadow: 0 0 20px var(--primary-glow);
+}
+
+.header p {
+    color: #888;
+    letter-spacing: 2px;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+/* =========================
+   KARTY / SIATKA
+========================= */
+.calculator-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 25px;
+}
+
+.calculator-card {
+    background: var(--secondary);
+    border: 1px solid var(--border);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
+}
+
+.calculator-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-6px);
+    box-shadow: 0 10px 30px rgba(0, 255, 136, 0.15);
+}
+
+.calculator-card-header {
+    background: var(--gray);
+    padding: 25px;
+    border-bottom: 1px solid var(--primary);
+}
+
+.calculator-card h2 {
+    color: var(--primary);
+    font-size: 20px;
+}
+
+.calculator-card p {
+    color: #888;
+    font-size: 13px;
+    margin: 10px 0;
+}
+
+/* =========================
+   FORMULARZE
+========================= */
+.form-wrapper {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 30px;
+}
+
+.form-section {
+    background: var(--secondary);
+    padding: 30px;
+    border: 1px solid var(--border);
+    clip-path: polygon(0 0, calc(100% - 30px) 0, 100% 30px, 100% 100%, 0 100%);
+}
+
+.form-section h3 {
+    color: var(--primary);
+    margin-bottom: 20px;
+    font-size: 16px;
+    letter-spacing: 2px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: var(--primary);
+    font-weight: bold;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    background: var(--dark);
+    border: 1px solid var(--border);
+    padding: 14px;
+    color: var(--primary);
+    font-family: var(--font-main);
+    font-size: 16px;
+    transition: var(--transition);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 12px var(--primary-glow);
+}
+
+/* =========================
+   TYPE SELECTOR (BUY/SELL)
+========================= */
+.type-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.type-btn {
+    padding: 12px;
+    background: var(--dark);
+    border: 1px solid var(--border);
+    color: var(--light);
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.type-btn:hover {
+    border-color: var(--primary);
+}
+
+.type-btn.active {
+    background: var(--primary);
+    color: var(--dark);
+    border-color: var(--primary);
+    box-shadow: 0 0 15px var(--primary-glow);
+}
+
+/* =========================
+   PRZYCISKI
+========================= */
+.calculator-link,
+.btn {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    background: var(--primary);
+    color: var(--dark);
+    text-align: center;
+    text-decoration: none;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+    font-family: var(--font-main);
+    font-size: 14px;
+    clip-path: polygon(0 0, 95% 0, 100% 25%, 100% 100%, 5% 100%, 0 75%);
+}
+
+.calculator-link:hover,
+.btn:hover {
+    background: var(--light);
+    transform: scale(1.03);
+    box-shadow: 0 0 20px var(--primary-glow);
+}
+
+/* =========================
+   WYNIKI
+========================= */
+.result-section {
+    background: var(--gray);
+    padding: 30px;
+    border: 1px solid var(--primary);
+}
+
+.result-section.show {
+    animation: scanLine 0.4s ease-out;
+}
+
+@keyframes scanLine {
+    from { opacity: 0; transform: scale(0.97); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.alert {
+    padding: 20px;
+    background: rgba(0, 255, 136, 0.05);
+    border-left: 5px solid var(--primary);
+    margin-bottom: 20px;
+}
+
+.result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
+}
+
+.result-item {
+    background: var(--dark);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--primary);
+    padding: 15px;
+    text-align: center;
+}
+
+.result-label {
+    display: block;
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.result-value {
+    display: block;
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--primary);
+    text-shadow: 0 0 10px var(--primary-glow);
+}
+
+/* =========================
+   TABELE
+========================= */
+.result-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 25px;
+}
+
+.result-table th {
+    background: var(--gray);
+    color: var(--primary);
+    padding: 14px;
+    border-bottom: 2px solid var(--primary);
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.result-table td {
+    padding: 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    text-align: center;
+}
+
+.result-table tr:hover {
+    background: rgba(0, 255, 136, 0.05);
+}
+
+/* =========================
+   FOOTER
+========================= */
+.footer {
+    background: var(--secondary);
+    border-top: 2px solid var(--primary);
+    padding: 40px;
+    margin-top: 70px;
+    text-align: center;
+}
+
+.footer p {
+    color: #888;
+    letter-spacing: 2px;
+    font-size: 13px;
+}
+
+/* =========================
+   RESPONSYWNOŚĆ
+========================= */
+@media (max-width: 992px) {
+    .form-wrapper { 
+        grid-template-columns: 1fr; 
+    }
+}
+
+@media (max-width: 600px) {
+    .nav-container { 
+        flex-direction: column; 
+        gap: 15px; 
+    }
+    .header h1 { 
+        font-size: 28px; 
+    }
+    .nav-links a { 
+        padding: 6px 10px; 
+        font-size: 10px; 
+    }
+    .type-selector {
+        grid-template-columns: 1fr;
+    }
+    .calculator-grid {
+        grid-template-columns: 1fr;
+    }
+}

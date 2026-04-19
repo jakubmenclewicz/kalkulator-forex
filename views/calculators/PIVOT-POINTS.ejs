@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pivot Points - TRADE FLOW</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">◢ TRADE FLOW ◣</a>
+            <ul class="nav-links">
+                <li><a href="/">MENU</a></li>
+                <li><a href="/position-size">POS SIZE</a></li>
+                <li><a href="/fibonacci">FIBONACCI</a></li>
+                <li><a href="/pivot-points" class="active">PIVOTS</a></li>
+                <li><a href="/risk-reward">R/R</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="header">
+        <h1>◢ PIVOT POINTS CALCULATOR ◣</h1>
+        <p>Daily support and resistance floor levels</p>
+    </div>
+
+    <div class="container">
+        <div class="form-wrapper">
+            <div class="form-section">
+                <h3>❯❯ PREVIOUS SESSION DATA</h3>
+                <form id="pivotForm">
+                    <div class="form-group">
+                        <label>PREVIOUS HIGH</label>
+                        <input type="number" id="highPrice" step="0.00001" placeholder="Max price of previous candle" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>PREVIOUS LOW</label>
+                        <input type="number" id="lowPrice" step="0.00001" placeholder="Min price of previous candle" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>PREVIOUS CLOSE</label>
+                        <input type="number" id="closePrice" step="0.00001" placeholder="Last price of previous candle" required>
+                    </div>
+
+                    <button type="submit" class="btn">◢ CALCULATE PIVOTS ◣</button>
+                    <button type="button" class="btn" style="background: var(--gray); color: var(--light); margin-top: 10px;" onclick="resetPivots()">⟲ RESET SYSTEM</button>
+                </form>
+            </div>
+
+            <div class="result-section" id="pivotResults">
+                <div class="alert">
+                    <h4 id="resTitle">▸ PIVOT LEVELS READY</h4>
+                    <p style="font-size: 11px; opacity: 0.7;">Calculated using Floor Pivot Formula</p>
+                </div>
+
+                <div class="result-item" style="border: 2px solid var(--primary); margin-bottom: 20px;">
+                    <span class="result-label">MAIN PIVOT POINT (PP)</span>
+                    <span class="result-value" id="ppValue">0.00000</span>
+                </div>
+
+                <table class="result-table">
+                    <thead>
+                        <tr>
+                            <th>LEVEL</th>
+                            <th>PRICE</th>
+                            <th>STRENGTH</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pivotTableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <footer class="footer">
+        <p>◢ TRADE FLOW - Professional Trading Tools ◣</p>
+    </footer>
+
+    <script>
+        document.getElementById('pivotForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const H = parseFloat(document.getElementById('highPrice').value);
+            const L = parseFloat(document.getElementById('lowPrice').value);
+            const C = parseFloat(document.getElementById('closePrice').value);
+            const tableBody = document.getElementById('pivotTableBody');
+            
+            if (isNaN(H) || isNaN(L) || isNaN(C)) return;
+
+            // Pivot Point Formula (Floor)
+            const PP = (H + L + C) / 3;
+            
+            const levels = [
+                { name: 'R3', price: H + 2 * (PP - L), type: 'RESISTANCE', color: 'var(--accent)' },
+                { name: 'R2', price: PP + (H - L), type: 'RESISTANCE', color: 'var(--accent)' },
+                { name: 'R1', price: (2 * PP) - L, type: 'RESISTANCE', color: 'var(--accent)' },
+                { name: 'S1', price: (2 * PP) - H, type: 'SUPPORT', color: 'var(--primary)' },
+                { name: 'S2', price: PP - (H - L), type: 'SUPPORT', color: 'var(--primary)' },
+                { name: 'S3', price: L - 2 * (H - PP), type: 'SUPPORT', color: 'var(--primary)' }
+            ];
+
+            document.getElementById('ppValue').textContent = PP.toFixed(5);
+            tableBody.innerHTML = '';
+
+            levels.forEach(lvl => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="color: ${lvl.color}; font-weight: bold;">${lvl.name}</td>
+                    <td>${lvl.price.toFixed(5)}</td>
+                    <td style="font-size: 10px; opacity: 0.6;">${lvl.type}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            document.getElementById('pivotResults').classList.add('show');
+        });
+
+        function resetPivots() {
+            document.getElementById('pivotForm').reset();
+            document.getElementById('pivotResults').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

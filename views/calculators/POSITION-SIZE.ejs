@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Position Size Calculator - TRADE FLOW</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">◢ TRADE FLOW ◣</a>
+            <ul class="nav-links">
+                <li><a href="/">MENU</a></li>
+                <li><a href="/position-size" class="active">POSITION SIZE</a></li>
+                <li><a href="/stop-loss-take-profit">SL/TP</a></li>
+                <li><a href="/profit-loss">P/L</a></li>
+                <li><a href="/risk-reward">RISK/REWARD</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="header">
+        <h1>◢ POSITION SIZE CALCULATOR ◣</h1>
+        <p>Calculate Optimal Position Size with Risk Management</p>
+    </div>
+
+    <div class="container">
+        <div class="info-box">
+            <h4>❯❯ WHAT IS POSITION SIZE?</h4>
+            <p>Position Size is the size of a trade that determines how many lots you should open in order to risk a specific amount of money.</p>
+        </div>
+
+        <div class="form-wrapper">
+            <div class="form-section">
+                <h3>❯❯ INPUT PARAMETERS</h3>
+                <form id="positionSizeForm">
+                    <div class="form-group">
+                        <label>ACCOUNT BALANCE ($)</label>
+                        <input type="number" id="accountBalance" name="accountBalance" value="10000" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>RISK PER TRADE (%)</label>
+                        <input type="number" id="riskPercentage" name="riskPercentage" value="2" step="0.1" min="0.1" max="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CURRENCY PAIR</label>
+                        <select id="currencyPair" name="currencyPair">
+                            <option value="EURUSD">EUR/USD</option>
+                            <option value="GBPUSD">GBP/USD</option>
+                            <option value="USDJPY">USD/JPY</option>
+                            <option value="AUDUSD">AUD/USD</option>
+                            <option value="USDCAD">USD/CAD</option>
+                            <option value="NZDUSD">NZD/USD</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>ENTRY PRICE</label>
+                        <input type="number" id="entryPrice" name="entryPrice" value="1.1000" step="0.00001" required>
+                    </div>
+                    
+                    <!-- Toggle między ceną a pipsami -->
+                    <div class="form-group">
+                        <label>STOP LOSS METHOD</label>
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                            <button type="button" class="btn-toggle active" id="btnSlPrice" onclick="toggleStopLossMethod('price')">BY PRICE</button>
+                            <button type="button" class="btn-toggle" id="btnSlPips" onclick="toggleStopLossMethod('pips')">BY PIPS</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" id="groupSlPrice">
+                        <label>STOP LOSS (PRICE)</label>
+                        <input type="number" id="stopLossPrice" name="stopLossPrice" value="1.0950" step="0.00001">
+                    </div>
+                    
+                    <div class="form-group" id="groupSlPips" style="display: none;">
+                        <label>STOP LOSS (PIPS)</label>
+                        <input type="number" id="stopLossPips" name="stopLossPips" value="50" step="0.1" min="0.1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>PIP VALUE ($)</label>
+                        <input type="number" id="pipValue" name="pipValue" value="10" step="0.01" required>
+                    </div>
+                    <button type="submit" class="btn">◢ CALCULATE POSITION SIZE ◣</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">⟲ RESET</button>
+                </form>
+            </div>
+
+            <div class="result-section" id="results">
+                <h3>❯❯ CALCULATION RESULTS</h3>
+                <div class="result-grid">
+                    <div class="result-item">
+                        <span class="result-label">RISK AMOUNT</span>
+                        <span class="result-value" id="riskAmount">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">DISTANCE (PIPS)</span>
+                        <span class="result-value" id="pipDistance">-</span>
+                    </div>
+                </div>
+                <div class="alert alert-success" id="mainResult">
+                    <h4 style="margin-bottom: 10px; color: var(--primary);">▸ RECOMMENDED POSITION SIZE:</h4>
+                    <div style="font-size: 32px; font-weight: bold; margin: 10px 0; color: var(--primary);" id="lotsDisplay">-</div>
+                </div>
+                <div class="result-grid">
+                    <div class="result-item">
+                        <span class="result-label">POSITION SIZE</span>
+                        <span class="result-value" id="positionSize">-</span>
+                    </div>
+                    <div class="result-item" style="border-left-color: #ff4757;">
+                        <span class="result-label">MAX LOSS</span>
+                        <span class="result-value" style="color: #ff4757;" id="maxLoss">-</span>
+                    </div>
+                </div>
+                <div id="recommendation"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>◢ TRADE FLOW - Professional Trading Tools ◣</p>
+    </div>
+
+<script>
+    const form = document.getElementById('positionSizeForm');
+    const resultsArea = document.getElementById('results');
+    let stopLossMethod = 'price'; // domyślnie cena
+
+    // Funkcja przełączania metody SL
+    window.toggleStopLossMethod = function(method) {
+        stopLossMethod = method;
+        
+        // Aktualizacja przycisków
+        document.getElementById('btnSlPrice').classList.toggle('active', method === 'price');
+        document.getElementById('btnSlPips').classList.toggle('active', method === 'pips');
+        
+        // Pokazywanie/ukrywanie pól
+        document.getElementById('groupSlPrice').style.display = method === 'price' ? 'block' : 'none';
+        document.getElementById('groupSlPips').style.display = method === 'pips' ? 'block' : 'none';
+        
+        runCalculation();
+    };
+
+    const runCalculation = () => {
+        const balance = parseFloat(document.getElementById('accountBalance').value) || 0;
+        const riskPercent = parseFloat(document.getElementById('riskPercentage').value) || 0;
+        const entry = parseFloat(document.getElementById('entryPrice').value) || 0;
+        const pipValueStandard = parseFloat(document.getElementById('pipValue').value) || 0;
+        const pair = document.getElementById('currencyPair').value;
+
+        // Walidacja podstawowa
+        if (balance <= 0 || riskPercent <= 0 || entry <= 0 || pipValueStandard <= 0) {
+            resultsArea.classList.remove('show');
+            return;
+        }
+
+        let pipDistance = 0;
+
+        // Obliczanie dystansu w zależności od metody
+        if (stopLossMethod === 'price') {
+            const stopLossPrice = parseFloat(document.getElementById('stopLossPrice').value) || 0;
+            if (stopLossPrice <= 0 || entry === stopLossPrice) {
+                resultsArea.classList.remove('show');
+                return;
+            }
+            
+            // Dystans w pipsach z ceny
+            let priceDiff = Math.abs(entry - stopLossPrice);
+            const multiplier = pair.includes('JPY') ? 100 : 10000;
+            pipDistance = priceDiff * multiplier;
+        } else {
+            // Dystans bezpośrednio w pipsach
+            pipDistance = parseFloat(document.getElementById('stopLossPips').value) || 0;
+        }
+
+        // Sprawdzenie czy dystans jest większy od zera
+        if (pipDistance <= 0) {
+            resultsArea.classList.remove('show');
+            return;
+        }
+
+        // 2. Ryzyko gotówkowe
+        const riskAmount = balance * (riskPercent / 100);
+
+        // 3. Obliczanie lotów
+        const lots = riskAmount / (pipDistance * pipValueStandard);
+
+        // Wyświetlanie wyników
+        document.getElementById('riskAmount').textContent = '$' + riskAmount.toFixed(2);
+        document.getElementById('pipDistance').textContent = pipDistance.toFixed(1) + ' pips';
+        document.getElementById('lotsDisplay').textContent = lots.toFixed(2) + ' LOTS';
+        document.getElementById('positionSize').textContent = Math.round(lots * 100000).toLocaleString() + ' units';
+        document.getElementById('maxLoss').textContent = '$' + riskAmount.toFixed(2);
+
+        // Pokazanie sekcji wyników
+        resultsArea.classList.add('show');
+
+        // Rekomendacje
+        let recHTML = '';
+        if (lots < 0.01) {
+            recHTML = '<div class="alert alert-warning" style="background: rgba(255, 193, 7, 0.1); border-left-color: #ffc107; color: #ffc107;">⚠ Position too small (< 0.01 lots). Consider increasing risk % or decreasing stop loss distance.</div>';
+        } else if (lots > 10) {
+            recHTML = '<div class="alert alert-warning" style="background: rgba(255, 193, 7, 0.1); border-left-color: #ffc107; color: #ffc107;">⚠ Large position size. Verify your parameters and broker limits.</div>';
+        } else {
+            recHTML = '<div class="alert alert-success">✓ Risk-managed position size calculated successfully.</div>';
+        }
+        document.getElementById('recommendation').innerHTML = recHTML;
+    };
+
+    // Obsługa zdarzeń - kalkulacja przy każdej zmianie
+    form.querySelectorAll('input, select').forEach(el => {
+        el.addEventListener('input', runCalculation);
+        el.addEventListener('change', runCalculation);
+    });
+
+    // Obsługa wysłania formularza
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        runCalculation();
+    });
+
+    // Zmiana pary walutowej - automatyczna aktualizacja wartości
+    document.getElementById('currencyPair').addEventListener('change', function() {
+        if (this.value.includes('JPY')) {
+            document.getElementById('pipValue').value = "9.15";
+            document.getElementById('entryPrice').value = "148.50";
+            document.getElementById('stopLossPrice').value = "148.00";
+        } else {
+            document.getElementById('pipValue').value = "10.00";
+            document.getElementById('entryPrice').value = "1.1000";
+            document.getElementById('stopLossPrice').value = "1.0950";
+        }
+        runCalculation();
+    });
+
+    // Funkcja resetowania formularza
+    window.resetForm = function() {
+        form.reset();
+        resultsArea.classList.remove('show');
+        stopLossMethod = 'price';
+        
+        // Przywróć domyślne wartości
+        document.getElementById('accountBalance').value = "10000";
+        document.getElementById('riskPercentage').value = "2";
+        document.getElementById('currencyPair').value = "EURUSD";
+        document.getElementById('entryPrice').value = "1.1000";
+        document.getElementById('stopLossPrice').value = "1.0950";
+        document.getElementById('stopLossPips').value = "50";
+        document.getElementById('pipValue').value = "10";
+        
+        // Przywróć widok
+        toggleStopLossMethod('price');
+    };
+
+    // Uruchom kalkulację przy załadowaniu strony
+    window.onload = function() {
+        runCalculation();
+    };
+</script>
+
+<style>
+    .btn-toggle {
+        flex: 1;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 12px;
+    }
+    
+    .btn-toggle:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .btn-toggle.active {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: #000;
+    }
+</style>
+</body>
+</html>

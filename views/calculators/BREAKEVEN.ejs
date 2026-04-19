@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breakeven Calculator - TradeFlow</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">◢ TRADEFLOW ◣</a>
+            <ul class="nav-links">
+                <li><a href="/">HOME</a></li>
+                <li><a href="/position-size">POSITION</a></li>
+                <li><a href="/portfolio-risk">PORTFOLIO</a></li>
+                <li><a href="/breakeven" class="active">BREAKEVEN</a></li>
+                <li><a href="/risk-reward">R/R</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="header">
+        <h1>◢ BREAKEVEN CALCULATOR ◣</h1>
+        <p>Calculate When and Where to Move Stop Loss to Breakeven</p>
+    </div>
+
+    <div class="container">
+        
+        <div class="info-box">
+            <h4>▸▸ WHAT IS BREAKEVEN?</h4>
+            <p>Moving your Stop Loss to breakeven means adjusting it to your entry price (plus costs) so you can't lose money on the trade. This is a crucial risk management technique that locks in "no loss" while keeping upside potential.</p>
+        </div>
+
+        <div class="form-wrapper">
+            <div class="form-section">
+                <h3>▸▸ TRADE DETAILS</h3>
+                
+                <form id="breakevenForm">
+                    <div class="form-group">
+                        <label>DIRECTION</label>
+                        <select name="direction" id="direction" required>
+                            <option value="buy">BUY (LONG)</option>
+                            <option value="sell">SELL (SHORT)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>ENTRY PRICE</label>
+                        <input type="number" name="entryPrice" value="1.10000" step="0.00001" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>CURRENT PRICE</label>
+                        <input type="number" name="currentPrice" value="1.10500" step="0.00001" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>ORIGINAL STOP LOSS</label>
+                        <input type="number" name="originalSL" value="1.09500" step="0.00001" required>
+                    </div>
+
+                    <h3 style="margin-top: 30px; margin-bottom: 20px;">▸▸ TRADING COSTS</h3>
+
+                    <div class="form-group">
+                        <label>SPREAD (PIPS)</label>
+                        <input type="number" name="spread" value="1.5" step="0.1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>COMMISSION PER LOT ($)</label>
+                        <input type="number" name="commission" value="7" step="0.01">
+                    </div>
+
+                    <div class="form-group">
+                        <label>LOT SIZE</label>
+                        <input type="number" name="lotSize" value="1" step="0.01" required>
+                    </div>
+
+                    <h3 style="margin-top: 30px; margin-bottom: 20px;">▸▸ BREAKEVEN RULES</h3>
+
+                    <div class="form-group">
+                        <label>MOVE TO BE AFTER (PIPS)</label>
+                        <input type="number" name="beAfterPips" value="20" step="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>ADD BUFFER (PIPS)</label>
+                        <input type="number" name="bufferPips" value="2" step="0.1" required>
+                    </div>
+
+                    <button type="submit" class="btn">◢ CALCULATE BREAKEVEN ◣</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">⟲ RESET</button>
+                </form>
+            </div>
+
+            <div class="result-section" id="results">
+                <h3>▸▸ BREAKEVEN ANALYSIS</h3>
+                
+                <div class="alert alert-success" id="breakevenStatus">
+                    <h4 style="margin-bottom: 10px;">▸ BREAKEVEN STATUS:</h4>
+                    <div style="font-size: 28px; font-weight: bold; margin: 15px 0;" id="statusText">CALCULATING...</div>
+                </div>
+
+                <div class="result-grid">
+                    <div class="result-item">
+                        <span class="result-label">BREAKEVEN PRICE</span>
+                        <span class="result-value neutral" id="breakevenPrice">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">CURRENT PROFIT (PIPS)</span>
+                        <span class="result-value positive" id="currentProfitPips">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">PIPS TO BREAKEVEN</span>
+                        <span class="result-value neutral" id="pipsToBreakeven">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">TOTAL COSTS</span>
+                        <span class="result-value negative" id="totalCosts">-</span>
+                    </div>
+                </div>
+
+                <div id="actionAlert"></div>
+
+                <div class="result-section show" style="margin-top: 25px;">
+                    <h3>▸▸ STOP LOSS LEVELS</h3>
+                    <table class="result-table">
+                        <thead>
+                            <tr>
+                                <th>LEVEL</th>
+                                <th>PRICE</th>
+                                <th>DESCRIPTION</th>
+                            </tr>
+                        </thead>
+                        <tbody id="levelsTable">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="result-grid" style="margin-top: 25px;">
+                    <div class="result-item">
+                        <span class="result-label">ENTRY PRICE</span>
+                        <span class="result-value neutral" id="displayEntry">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">CURRENT PRICE</span>
+                        <span class="result-value positive" id="displayCurrent">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">ORIGINAL SL</span>
+                        <span class="result-value negative" id="displayOriginalSL">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">RISK SAVED</span>
+                        <span class="result-value positive" id="riskSaved">-</span>
+                    </div>
+                </div>
+
+                <div class="info-box" style="margin-top: 25px;">
+                    <h4>▸▸ WHAT TO DO NEXT</h4>
+                    <div id="nextSteps"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-section show" style="margin-top: 40px;">
+            <h3>▸▸ BREAKEVEN STRATEGIES</h3>
+            <table class="result-table">
+                <thead>
+                    <tr>
+                        <th>STRATEGY</th>
+                        <th>WHEN TO USE</th>
+                        <th>PROS</th>
+                        <th>CONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Conservative (1:1)</strong></td>
+                        <td>Move SL to BE after 1x risk in profit</td>
+                        <td>Quick protection, less stress</td>
+                        <td>May get stopped out early</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Standard (1.5:1)</strong></td>
+                        <td>Move SL to BE after 1.5x risk in profit</td>
+                        <td>Good balance, professional standard</td>
+                        <td>Still some early stop risk</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Aggressive (2:1)</strong></td>
+                        <td>Move SL to BE after 2x risk in profit</td>
+                        <td>More breathing room</td>
+                        <td>Longer time at risk</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Trailing Stop</strong></td>
+                        <td>Move SL continuously with price</td>
+                        <td>Locks in more profit</td>
+                        <td>More complex to manage</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="info-box" style="margin-top: 30px;">
+            <h4>▸▸ PRO TIPS</h4>
+            <p><strong>• Add a buffer:</strong> Always add 2-5 pips buffer to avoid getting stopped out by spread widening or small retracements.</p>
+            <p><strong>• Consider the spread:</strong> Remember spread costs when calculating breakeven - especially important for short-term trades.</p>
+            <p><strong>• Account for commission:</strong> If your broker charges commission, include it in breakeven calculation.</p>
+            <p><strong>• Wait for confirmation:</strong> Don't move to BE too early - price needs room to breathe.</p>
+            <p><strong>• Use support/resistance:</strong> Place BE stop slightly beyond nearby support/resistance levels.</p>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p>◢ TRADEFLOW - Professional Forex Trading Calculators ◣</p>
+    </div>
+
+    <script>
+        const form = document.getElementById('breakevenForm');
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+            
+            calculateBreakeven(data);
+        });
+
+        function calculateBreakeven(data) {
+            const direction = data.direction;
+            const entryPrice = parseFloat(data.entryPrice);
+            const currentPrice = parseFloat(data.currentPrice);
+            const originalSL = parseFloat(data.originalSL);
+            const spread = parseFloat(data.spread);
+            const commission = parseFloat(data.commission) || 0;
+            const lotSize = parseFloat(data.lotSize);
+            const beAfterPips = parseFloat(data.beAfterPips);
+            const bufferPips = parseFloat(data.bufferPips);
+
+            const pipSize = 0.0001;
+
+            // Calculate costs in pips
+            const spreadCost = spread;
+            const commissionInPips = (commission * 2) / (lotSize * 10);
+            const totalCostPips = spreadCost + commissionInPips;
+
+            // Calculate breakeven price
+            let breakevenPrice;
+            if (direction === 'buy') {
+                breakevenPrice = entryPrice + (totalCostPips * pipSize) + (bufferPips * pipSize);
+            } else {
+                breakevenPrice = entryPrice - (totalCostPips * pipSize) - (bufferPips * pipSize);
+            }
+
+            // Calculate current profit/loss in pips
+            let currentProfitPips;
+            if (direction === 'buy') {
+                currentProfitPips = (currentPrice - entryPrice) / pipSize;
+            } else {
+                currentProfitPips = (entryPrice - currentPrice) / pipSize;
+            }
+
+            // Calculate original risk
+            const originalRiskPips = Math.abs(entryPrice - originalSL) / pipSize;
+
+            // Calculate pips to breakeven trigger
+            const pipsToBreakeven = Math.max(0, beAfterPips - currentProfitPips);
+
+            // Determine if we should move to BE
+            const shouldMoveToBreakeven = currentProfitPips >= beAfterPips;
+
+            // Calculate risk saved
+            const riskSavedPips = shouldMoveToBreakeven ? originalRiskPips : 0;
+            const riskSavedDollars = riskSavedPips * lotSize * 10;
+
+            // Display results
+            document.getElementById('results').classList.add('show');
+            document.getElementById('breakevenPrice').textContent = breakevenPrice.toFixed(5);
+            document.getElementById('currentProfitPips').textContent = currentProfitPips.toFixed(1) + ' pips';
+            document.getElementById('pipsToBreakeven').textContent = pipsToBreakeven.toFixed(1) + ' pips';
+            document.getElementById('totalCosts').textContent = totalCostPips.toFixed(1) + ' pips';
+            document.getElementById('displayEntry').textContent = entryPrice.toFixed(5);
+            document.getElementById('displayCurrent').textContent = currentPrice.toFixed(5);
+            document.getElementById('displayOriginalSL').textContent = originalSL.toFixed(5);
+            document.getElementById('riskSaved').textContent = '$' + riskSavedDollars.toFixed(2);
+
+            // Status alert
+            let statusHTML;
+            if (shouldMoveToBreakeven) {
+                statusHTML = `
+                    <div class="alert alert-success">
+                        <h4>✓ MOVE STOP LOSS TO BREAKEVEN NOW</h4>
+                        <div style="font-size: 32px; font-weight: bold; margin: 15px 0;">${breakevenPrice.toFixed(5)}</div>
+                        <p>Your trade has moved ${currentProfitPips.toFixed(1)} pips in profit. Time to protect your capital!</p>
+                    </div>
+                `;
+            } else {
+                statusHTML = `
+                    <div class="alert alert-warning">
+                        <h4>⏳ WAIT - NOT YET AT BREAKEVEN LEVEL</h4>
+                        <div style="font-size: 28px; font-weight: bold; margin: 15px 0;">Need ${pipsToBreakeven.toFixed(1)} more pips</div>
+                        <p>Current profit: ${currentProfitPips.toFixed(1)} pips | Target: ${beAfterPips} pips</p>
+                    </div>
+                `;
+            }
+            document.getElementById('breakevenStatus').innerHTML = statusHTML;
+
+            // Levels table
+            let levelsHTML = `
+                <tr>
+                    <td><strong>Original Stop Loss</strong></td>
+                    <td>${originalSL.toFixed(5)}</td>
+                    <td>Your initial risk level</td>
+                </tr>
+                <tr style="background: rgba(0, 255, 136, 0.1);">
+                    <td><strong>Breakeven Stop</strong></td>
+                    <td>${breakevenPrice.toFixed(5)}</td>
+                    <td>No-loss level (includes costs + buffer)</td>
+                </tr>
+                <tr>
+                    <td><strong>Entry Price</strong></td>
+                    <td>${entryPrice.toFixed(5)}</td>
+                    <td>Your entry (without costs)</td>
+                </tr>
+                <tr>
+                    <td><strong>Current Price</strong></td>
+                    <td>${currentPrice.toFixed(5)}</td>
+                    <td>Live market price</td>
+                </tr>
+            `;
+            document.getElementById('levelsTable').innerHTML = levelsHTML;
+
+            // Next steps
+            let nextStepsHTML;
+            if (shouldMoveToBreakeven) {
+                nextStepsHTML = `
+                    <p><strong>1. Open your trading platform</strong></p>
+                    <p><strong>2. Modify the Stop Loss to: ${breakevenPrice.toFixed(5)}</strong></p>
+                    <p><strong>3. Confirm the change</strong></p>
+                    <p><strong>4. You've now locked in zero loss!</strong></p>
+                    <p style="margin-top: 15px; color: var(--primary);">💡 Your risk is now eliminated. Let the trade run to your Take Profit!</p>
+                `;
+            } else {
+                nextStepsHTML = `
+                    <p><strong>1. Monitor the trade</strong> - Wait for price to move ${pipsToBreakeven.toFixed(1)} more pips</p>
+                    <p><strong>2. Set a price alert</strong> at ${direction === 'buy' ? 
+                        (entryPrice + (beAfterPips * pipSize)).toFixed(5) : 
+                        (entryPrice - (beAfterPips * pipSize)).toFixed(5)}</p>
+                    <p><strong>3. When alert triggers</strong> - Come back and move SL to ${breakevenPrice.toFixed(5)}</p>
+                    <p style="margin-top: 15px; color: #ffc800;">⏳ Be patient - Moving to BE too early can stop you out unnecessarily.</p>
+                `;
+            }
+            document.getElementById('nextSteps').innerHTML = nextStepsHTML;
+        }
+
+        function resetForm() {
+            form.reset();
+            document.getElementById('results').classList.remove('show');
+        }
+
+        // Auto-calculate on direction change
+        document.getElementById('direction').addEventListener('change', function() {
+            const direction = this.value;
+            const entryInput = document.querySelector('input[name="entryPrice"]');
+            const currentInput = document.querySelector('input[name="currentPrice"]');
+            const slInput = document.querySelector('input[name="originalSL"]');
+            
+            if (direction === 'buy') {
+                entryInput.value = '1.10000';
+                currentInput.value = '1.10500';
+                slInput.value = '1.09500';
+            } else {
+                entryInput.value = '1.10000';
+                currentInput.value = '1.09500';
+                slInput.value = '1.10500';
+            }
+        });
+    </script>
+</body>
+</html>

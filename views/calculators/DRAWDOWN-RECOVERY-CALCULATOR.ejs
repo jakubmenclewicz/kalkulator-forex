@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recovery Calculator - TRADE FLOW</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">◢ TRADE FLOW ◣</a>
+            <ul class="nav-links">
+                <li><a href="/">MENU</a></li>
+                <li><a href="/recovery" class="active">RECOVERY</a></li>
+                <li><a href="/compounding">COMPOUNDING</a></li>
+                <li><a href="/risk-reward">R/R</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="header">
+        <h1>◢ DRAWDOWN RECOVERY ◣</h1>
+        <p>The brutal math of trading losses</p>
+    </div>
+
+    <div class="container">
+        <div class="form-wrapper">
+            <div class="form-section">
+                <h3>❯❯ LOSS PARAMETERS</h3>
+                <form id="recoveryForm">
+                    <div class="form-group">
+                        <label>CURRENT LOSS PERCENTAGE (%)</label>
+                        <input type="number" id="lossAmount" step="0.1" value="10" min="0" max="99" required>
+                    </div>
+
+                    <button type="submit" class="btn">◢ CALCULATE RECOVERY ◣</button>
+                </form>
+            </div>
+
+            <div class="result-section" id="recoveryResults">
+                <div class="alert">
+                    <h4 id="resTitle">▸ ANALYSIS COMPLETE</h4>
+                    <p style="font-size: 11px; opacity: 0.7;">Recovery requirements detected</p>
+                </div>
+
+                <div class="result-grid" style="grid-template-columns: 1fr;">
+                    <div class="result-item" id="recoveryBox">
+                        <span class="result-label">RECOVERY NEEDED</span>
+                        <span class="result-value" id="recoveryValue">11.1%</span>
+                    </div>
+                </div>
+
+                <div class="info-box" style="margin-top: 25px;">
+                    <h4 style="color: var(--primary);">◢ MATHEMATICAL REALITY</h4>
+                    <p id="recoveryVerdict" style="font-size: 13px; line-height: 1.4;">
+                        To recover a 10% loss, you need an 11.1% gain on your remaining capital.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <footer class="footer">
+        <p>◢ TRADE FLOW - Professional Trading Tools ◣</p>
+    </footer>
+
+    <script>
+        document.getElementById('recoveryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const loss = parseFloat(document.getElementById('lossAmount').value);
+            if (isNaN(loss) || loss >= 100) return;
+
+            // Formula: (1 / (1 - (loss/100)) - 1) * 100
+            const recovery = ((1 / (1 - (loss / 100))) - 1) * 100;
+
+            document.getElementById('recoveryValue').textContent = recovery.toFixed(1) + '%';
+            
+            const verdict = document.getElementById('recoveryVerdict');
+            const box = document.getElementById('recoveryBox');
+
+            if (loss > 50) {
+                verdict.innerHTML = `<span style="color: var(--accent)">CRITICAL DRAWDOWN:</span> Recovering a ${loss}% loss is statistically improbable for most traders. Focus on capital preservation.`;
+                box.style.borderColor = "var(--accent)";
+            } else if (loss > 20) {
+                verdict.innerHTML = `<span style="color: #ffaa00">DANGEROUS ZONE:</span> You need ${recovery.toFixed(1)}% to break even. High risk of emotional trading (revenge trading).`;
+                box.style.borderColor = "#ffaa00";
+            } else {
+                verdict.innerHTML = `<span style="color: var(--primary)">MANAGEABLE:</span> A ${loss}% loss is part of the game. Stay disciplined.`;
+                box.style.borderColor = "var(--primary)";
+            }
+
+            document.getElementById('recoveryResults').classList.add('show');
+        });
+    </script>
+</body>
+</html>

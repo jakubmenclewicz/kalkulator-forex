@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pip Distance Calculator - TRADE FLOW</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">◢ TRADE FLOW ◣</a>
+            <ul class="nav-links">
+                <li><a href="/">MENU</a></li>
+                <li><a href="/position-size">POS SIZE</a></li>
+                <li><a href="/pip-calculator" class="active">PIP DISTANCE</a></li>
+                <li><a href="/profit-loss">P/L</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="header">
+        <h1>◢ PIP DISTANCE CALCULATOR ◣</h1>
+        <p>Calculate gap between entry and exit prices</p>
+    </div>
+
+    <div class="container">
+        <div class="form-wrapper">
+            <div class="form-section">
+                <h3>❯❯ PRICE ACTION DATA</h3>
+                <form id="pipDistForm">
+                    <div class="form-group">
+                        <label>INSTRUMENT PRECISION</label>
+                        <select id="digitType">
+                            <option value="0.0001">Standard (5 decimals / 4th is Pip)</option>
+                            <option value="0.01">JPY / Gold (3 decimals / 2nd is Pip)</option>
+                            <option value="1">Indices / Crypto (Whole points)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>ENTRY PRICE</label>
+                        <input type="number" id="entryPrice" step="0.00001" placeholder="1.08500" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>EXIT PRICE</label>
+                        <input type="number" id="exitPrice" step="0.00001" placeholder="1.09250" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>LOT SIZE (OPTIONAL FOR VALUE)</label>
+                        <input type="number" id="lots" value="1.0" step="0.01">
+                    </div>
+
+                    <button type="submit" class="btn">◢ ANALYZE DISTANCE ◣</button>
+                    <button type="button" class="btn" style="background: var(--gray); color: var(--light); margin-top: 10px;" onclick="resetDist()">⟲ RESET SYSTEM</button>
+                </form>
+            </div>
+
+            <div class="result-section" id="distResults">
+                <div class="alert">
+                    <h4 id="resTitle">▸ DISTANCE CALCULATED</h4>
+                    <p style="font-size: 11px; opacity: 0.7;">Market movement analysis</p>
+                </div>
+
+                <div class="result-grid">
+                    <div class="result-item" style="border: 2px solid var(--primary);">
+                        <span class="result-label">TOTAL PIPS</span>
+                        <span class="result-value" id="totalPips">0.0</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">POINTS / TICKS</span>
+                        <span class="result-value" id="totalPoints" style="color: var(--light);">0</span>
+                    </div>
+                </div>
+
+                <div class="info-box" style="margin-top: 25px;">
+                    <h4 style="color: var(--primary);">◢ MONETARY ESTIMATE</h4>
+                    <p style="font-size: 14px; line-height: 1.4;">
+                        Estimated Profit/Loss: <span id="moneyValue" style="color: var(--primary); font-weight: bold;">$ 0.00</span>
+                    </p>
+                    <p style="font-size: 10px; color: #888; margin-top: 5px;">*Assuming USD is the quote currency and 100k contract size.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <footer class="footer">
+        <p>◢ TRADE FLOW - Professional Trading Tools ◣</p>
+    </footer>
+
+    <script>
+        document.getElementById('pipDistForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const entry = parseFloat(document.getElementById('entryPrice').value);
+            const exit = parseFloat(document.getElementById('exitPrice').value);
+            const pipSize = parseFloat(document.getElementById('digitType').value);
+            const lots = parseFloat(document.getElementById('lots').value) || 0;
+            
+            if (isNaN(entry) || isNaN(exit)) return;
+
+            // Obliczanie dystansu
+            const rawDiff = Math.abs(exit - entry);
+            const pips = rawDiff / pipSize;
+            const points = rawDiff / (pipSize / 10); // 1 pip = 10 points/ticks
+
+            // Obliczanie wartości pieniężnej (uproszczone dla USD)
+            const contractSize = 100000;
+            const money = pips * pipSize * contractSize * lots;
+
+            // Update UI
+            document.getElementById('totalPips').textContent = pips.toFixed(1);
+            document.getElementById('totalPoints').textContent = points.toFixed(0);
+            document.getElementById('moneyValue').textContent = `$ ${money.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+
+            document.getElementById('distResults').classList.add('show');
+        });
+
+        function resetDist() {
+            document.getElementById('pipDistForm').reset();
+            document.getElementById('distResults').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

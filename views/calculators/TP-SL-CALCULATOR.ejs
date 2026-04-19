@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SL/TP Calculator - TRADE FLOW</title>
+        <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+    <div class="nav-container">
+        <a href="/" class="nav-logo">◢ TRADE FLOW ◣</a>
+        <ul class="nav-links">
+            <li><a href="/">MENU</a></li>
+            <li><a href="/compounding">COMPOUNDING</a></li>
+            <li><a href="/sl-tp" class="active">SL/TP CALC</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="header">
+    <h1>◢ SL/TP CALCULATOR ◣</h1>
+    <p>Precision price level projection for FX & Gold</p>
+</div>
+
+<div class="container">
+    <div class="form-wrapper">
+
+        <div class="form-section">
+            <h3>❯❯ POSITION PARAMETERS</h3>
+
+            <label style="font-size:10px;color:#888;margin-bottom:8px;display:block;">DIRECTION</label>
+            <div class="type-selector">
+                <div class="type-btn active" id="buyBtn" onclick="setDirection('BUY')">BUY / LONG</div>
+                <div class="type-btn" id="sellBtn" onclick="setDirection('SELL')">SELL / SHORT</div>
+            </div>
+
+            <div class="form-group">
+                <label>ENTRY PRICE</label>
+                <input type="number" id="entryPrice" value="1.08500" step="0.00001">
+            </div>
+
+            <div class="form-group">
+                <label>STOP LOSS (PIPS)</label>
+                <input type="number" id="slPips" value="20" step="0.1">
+            </div>
+
+            <div class="form-group">
+                <label>TAKE PROFIT (PIPS)</label>
+                <input type="number" id="tpPips" value="40" step="0.1">
+            </div>
+
+            <div class="form-group">
+                <label>INSTRUMENT TYPE</label>
+                <select id="pairType">
+                    <option value="FX5">FX – Standard (EURUSD)</option>
+                    <option value="JPY">JPY Pairs (USDJPY)</option>
+                    <option value="GOLD">Gold (XAUUSD)</option>
+                </select>
+            </div>
+
+            <button class="btn" onclick="calculate()">◢ CALCULATE TARGETS ◣</button>
+        </div>
+
+        <div class="result-section">
+            <div class="alert">
+                <h4 style="margin:0;color:var(--primary);">▸ CALCULATION ENGINE READY</h4>
+                <p style="font-size:11px;opacity:.7;margin:5px 0 0;">Targets based on pip precision</p>
+            </div>
+
+            <div class="result-grid">
+                <div class="result-item" style="border-left-color:#ff4757;">
+                    <span class="result-label">STOP LOSS LEVEL</span>
+                    <span class="result-value" id="slPrice">-</span>
+                </div>
+                <div class="result-item" style="border-left-color:var(--primary);">
+                    <span class="result-label">TAKE PROFIT LEVEL</span>
+                    <span class="result-value" id="tpPrice">-</span>
+                </div>
+            </div>
+
+            <div class="result-item" style="margin-top:15px;border-left-color:#48dbfb;">
+                <span class="result-label">RISK / REWARD</span>
+                <span class="result-value" id="rrRatio">-</span>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ================= JS ================= -->
+<script>
+let currentDirection = 'BUY';
+
+function setDirection(dir) {
+    currentDirection = dir;
+    document.getElementById('buyBtn').classList.toggle('active', dir === 'BUY');
+    document.getElementById('sellBtn').classList.toggle('active', dir === 'SELL');
+    calculate();
+}
+
+function getPipValue(type) {
+    if (type === 'FX5') return 0.0001;
+    if (type === 'JPY') return 0.01;
+    if (type === 'GOLD') return 0.1;
+}
+
+function getDecimals(type) {
+    if (type === 'FX5') return 5;
+    if (type === 'JPY') return 3;
+    if (type === 'GOLD') return 2;
+}
+
+function calculate() {
+    const entry = parseFloat(document.getElementById('entryPrice').value);
+    const slPips = parseFloat(document.getElementById('slPips').value);
+    const tpPips = parseFloat(document.getElementById('tpPips').value);
+    const type = document.getElementById('pairType').value;
+
+    if (!entry || slPips <= 0 || tpPips <= 0) return;
+
+    const pip = getPipValue(type);
+    const dec = getDecimals(type);
+
+    let sl, tp;
+
+    if (currentDirection === 'BUY') {
+        sl = entry - slPips * pip;
+        tp = entry + tpPips * pip;
+    } else {
+        sl = entry + slPips * pip;
+        tp = entry - tpPips * pip;
+    }
+
+    document.getElementById('slPrice').textContent = sl.toFixed(dec);
+    document.getElementById('tpPrice').textContent = tp.toFixed(dec);
+    document.getElementById('rrRatio').textContent = `1 : ${(tpPips / slPips).toFixed(2)}`;
+}
+
+window.onload = calculate;
+</script>
+
+<div class="footer">
+    <p>◢ TRADE FLOW - Professional Trading Tools ◣</p>
+</div>
+
+</body>
+</html>
